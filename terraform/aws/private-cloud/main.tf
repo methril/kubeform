@@ -52,7 +52,7 @@ module "elb" {
   source = "../elb"
 
   security_groups = "${module.sg-default.security_group_id}"
-  instances       = "${join(\",\", aws_instance.worker.*.id)}"
+  instances       = "${join(",", aws_instance.worker.*.id)}"
   subnets         = "${module.vpc.public_subnets}"
 }
 

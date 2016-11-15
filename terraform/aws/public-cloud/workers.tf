@@ -17,9 +17,9 @@ resource "template_file" "worker_cloud_init" {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"
     region             = "${var.region}"
-    etcd_ca            = "${replace(module.ca.ca_cert_pem, \"\n\", \"\\n\")}"
-    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, \"\n\", \"\\n\")}"
-    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, \"\n\", \"\\n\")}"
+    etcd_ca            = "${replace(module.ca.ca_cert_pem, "\n", "\\n")}"
+    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, "\n", "\\n")}"
+    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, "\n", "\\n")}"
   }
 }
 
