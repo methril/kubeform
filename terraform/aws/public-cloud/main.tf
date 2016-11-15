@@ -154,7 +154,7 @@ module "iam" {
 }
 
 # Generate an etcd URL for the cluster
-resource "template_file" "etcd_discovery_url" {
+data "template_file" "etcd_discovery_url" {
   template = "${file("/dev/null")}"
   provisioner "local-exec" {
     command = "curl https://discovery.etcd.io/new?size=${var.masters} > ${var.etcd_discovery_url_file}"

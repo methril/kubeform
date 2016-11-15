@@ -10,7 +10,7 @@ module "edge-router_ami" {
   virttype = "${module.edge-router_amitype.prefer_hvm}"
 }
 
-resource "template_file" "edge-router_cloud_init" {
+data "template_file" "edge-router_cloud_init" {
   template   = "${file("worker-cloud-config.yml.tpl")}"
   depends_on = ["template_file.etcd_discovery_url"]
   vars {
@@ -33,7 +33,7 @@ resource "aws_instance" "edge-router" {
   source_dest_check    = false
   security_groups      = ["${module.sg-default.security_group_id}"]
   depends_on           = ["aws_instance.master"]
-  user_data            = "${template_file.edge-router_cloud_init.rendered}"
+  user_data            = "${data.template_file.edge-router_cloud_init.rendered}"
   tags = {
     Name   = "kube-edge-router-${count.index}"
     role   = "edge-routers"

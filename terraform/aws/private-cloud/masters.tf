@@ -10,7 +10,7 @@ module "master_ami" {
   virttype = "${module.master_amitype.prefer_hvm}"
 }
 
-resource "template_file" "master_cloud_init" {
+data "template_file" "master_cloud_init" {
   template   = "master-cloud-config.yml.tpl"
   depends_on = ["template_file.etcd_discovery_url"]
   vars {
@@ -29,7 +29,7 @@ resource "aws_instance" "mmaster" {
   subnet_id         = "${element(split(",", module.vpc.private_subnets), count.index)}"
   security_groups   = ["${module.sg-default.security_group_id}"]
   depends_on        = ["aws_instance.bastion"]
-  user_data         = "${template_file.master_cloud_init.rendered}"
+  user_data         = "${data.template_file.master_cloud_init.rendered}"
   tags = {
     Name = "kube-master-${count.index}"
     role = "masters"
