@@ -13,7 +13,7 @@ module "bastion_ami" {
 
 data "template_file" "bastion_cloud_init" {
   template   = "bastion-cloud-config.yml.tpl"
-  depends_on = ["template_file.etcd_discovery_url"]
+  depends_on = ["null_resource.etcd_discovery_url"]
   vars {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"

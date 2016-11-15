@@ -12,7 +12,7 @@ module "worker_ami" {
 
 data "template_file" "worker_cloud_init" {
   template   = "worker-cloud-config.yml.tpl"
-  depends_on = ["template_file.etcd_discovery_url"]
+  depends_on = ["null_resource.etcd_discovery_url"]
   vars {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"
