@@ -1,8 +1,10 @@
 variable "access_key" {}
 variable "secret_key" {}
 variable "organization" { default = "kubeform" }
-variable "region" { default = "eu-west-1" }
-variable "availability_zones" { default = "eu-west-1a,eu-west-1b,eu-west-1c" }
+#variable "region" { default = "eu-west-1" }
+#variable "availability_zones" { default = "eu-west-1a,eu-west-1b,eu-west-1c" }
+variable "region" { default = "us-west-2" }
+variable "availability_zones" { default = "us-west-2a,us-west-2b" }
 variable "coreos_channel" { default = "alpha" }
 variable "etcd_discovery_url_file" { default = "etcd_discovery_url.txt" }
 variable "masters" { default = "3" }
