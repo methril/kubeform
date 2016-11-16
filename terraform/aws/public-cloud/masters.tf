@@ -60,8 +60,8 @@ resource "aws_instance" "master" {
 module "master_elb" {
   source             = "../elb"
   security_groups    = "${module.sg-default.security_group_id}"
-  instances          = "${compact(aws_instance.master.*.id)}"
-  subnets            = "${compact(split(",", module.public_subnet.subnet_ids))}"
+  instances          = [ "${aws_instance.master.*.id}" ]
+  subnets            = [ "${module.public_subnet.subnet_ids}" ]
 }
 
 output "master_ips" {
