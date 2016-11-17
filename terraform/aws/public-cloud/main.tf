@@ -4,9 +4,15 @@ variable "organization" { default = "kubeform" }
 #variable "region" { default = "eu-west-1" }
 #variable "availability_zones" { default = "eu-west-1a,eu-west-1b,eu-west-1c" }
 variable "region" { default = "us-west-2" }
+
+# length(availability_zones) must == length(vpc_public_cidrs_list)
 variable "availability_zones" {
     type = "list"
     default = [ "us-west-2a", "us-west-2b" ]
+}
+variable "vpc_public_cidrs_list" {
+    type = "list"
+    default = [ "10.0.1.0/24", "10.0.2.0/24" ]
 }
 variable "coreos_channel" { default = "alpha" }
 variable "etcd_discovery_url_file" { default = "etcd_discovery_url.txt" }
@@ -19,10 +25,6 @@ variable "edge-routers" { default = "1" }
 variable "edge-router_instance_type" { default = "m3.medium" }
 variable "edge-router_ebs_volume_size" { default = "30" }
 variable "vpc_cidr_block" { default = "10.0.0.0/16" }
-variable "vpc_public_cidrs_list" {
-    type = "list"
-    default = [ "10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ]
-}
 
 provider "aws" {
   access_key = "${var.access_key}"
