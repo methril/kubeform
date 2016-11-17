@@ -110,7 +110,7 @@ module "kube_admin_cert" {
   source                = "github.com/tamsky/tf_tls/kubernetes/admin"
   ca_cert_pem           = "${module.ca.ca_cert_pem}"
   ca_private_key_pem    = "${module.ca.ca_private_key_pem}"
-  kubectl_server_ip     = [ "${module.master_elb.elb_dns_name}" ]
+  kubectl_server_ip     = "${module.master_elb.elb_dns_name}"
 }
 
 module "docker_daemon_certs" {
