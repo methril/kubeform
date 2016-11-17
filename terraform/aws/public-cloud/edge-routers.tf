@@ -29,9 +29,9 @@ resource "aws_instance" "edge-router" {
   iam_instance_profile = "${module.iam.edge-router_profile_name}"
   count                = "${var.edge-routers}"
   key_name             = "${module.aws-keypair.keypair_name}"
-  subnet_id            = "${element(split(",", module.public_subnet.subnet_ids), count.index)}"
+  subnet_id            = "${element(module.public_subnet.subnet_ids, count.index)}"
   source_dest_check    = false
-  security_groups      = ["${module.sg-default.security_group_id}"]
+  vpc_security_group_ids = ["${module.sg-default.security_group_id}"]
   depends_on           = ["aws_instance.master"]
   user_data            = "${data.template_file.edge-router_cloud_init.rendered}"
   tags = {
