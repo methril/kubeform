@@ -50,7 +50,7 @@ module "ca" {
   source            = "github.com/Capgemini/tf_tls//ca"
   organization      = "${var.organization}"
   ca_count          = "${var.masters + var.workers + var.edge-routers}"
-  deploy_ssh_hosts  = "${concat(digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
+  deploy_ssh_hosts  = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
   ssh_user          = "core"
   ssh_private_key   = "${tls_private_key.ssh.private_key_pem}"
 }
@@ -65,9 +65,9 @@ module "kube_master_certs" {
   source                = "github.com/Capgemini/tf_tls/kubernetes/master"
   ca_cert_pem           = "${module.ca.ca_cert_pem}"
   ca_private_key_pem    = "${module.ca.ca_private_key_pem}"
-  ip_addresses          = "${compact(digitalocean_droplet.master.*.ipv4_address)}"
-  deploy_ssh_hosts      = "${compact(digitalocean_droplet.master.*.ipv4_address)}"
-  dns_names             = "test"
+  ip_addresses          = ["${compact(digitalocean_droplet.master.*.ipv4_address)}"]
+  deploy_ssh_hosts      = ["${compact(digitalocean_droplet.master.*.ipv4_address)}"]
+  dns_names             = ["test"]
   master_count          = "${var.masters}"
   validity_period_hours = "8760"
   early_renewal_hours   = "720"
@@ -79,8 +79,8 @@ module "kube_kubelet_certs" {
   source                = "github.com/Capgemini/tf_tls/kubernetes/kubelet"
   ca_cert_pem           = "${module.ca.ca_cert_pem}"
   ca_private_key_pem    = "${module.ca.ca_private_key_pem}"
-  ip_addresses          = "${concat( digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
-  deploy_ssh_hosts      = "${concat( digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
+  ip_addresses          = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
+  deploy_ssh_hosts      = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
   kubelet_count         = "${var.masters + var.workers + var.edge-routers}"
   validity_period_hours = "8760"
   early_renewal_hours   = "720"
@@ -99,8 +99,8 @@ module "docker_daemon_certs" {
   source                = "github.com/Capgemini/tf_tls//docker/daemon"
   ca_cert_pem           = "${module.ca.ca_cert_pem}"
   ca_private_key_pem    = "${module.ca.ca_private_key_pem}"
-  ip_addresses_list     = "${concat(digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
-  deploy_ssh_hosts      = "${concat(digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
+  ip_addresses_list     = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
+  deploy_ssh_hosts      = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
   docker_daemon_count   = "${var.masters + var.workers + var.edge-routers}"
   private_key           = "${tls_private_key.ssh.private_key_pem}"
   validity_period_hours = 8760
@@ -112,8 +112,8 @@ module "docker_client_certs" {
   source                = "github.com/Capgemini/tf_tls//docker/client"
   ca_cert_pem           = "${module.ca.ca_cert_pem}"
   ca_private_key_pem    = "${module.ca.ca_private_key_pem}"
-  ip_addresses_list     = "${concat(digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
-  deploy_ssh_hosts      = "${concat(digitalocean_droplet.edge-router.*.ipv4_address, concat(digitalocean_droplet.master.*.ipv4_address, digitalocean_droplet.worker.*.ipv4_address))}"
+  ip_addresses_list     = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
+  deploy_ssh_hosts      = ["${digitalocean_droplet.edge-router.*.ipv4_address}", "${digitalocean_droplet.master.*.ipv4_address}", "${digitalocean_droplet.worker.*.ipv4_address}"]
   docker_client_count   = "${var.masters + var.workers + var.edge-routers}"
   private_key           = "${tls_private_key.ssh.private_key_pem}"
   validity_period_hours = 8760
@@ -128,9 +128,9 @@ resource "template_file" "master_cloud_init" {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"
     region             = "${var.region}"
-    etcd_ca            = "${replace(module.ca.ca_cert_pem, \"\n\", \"\\n\")}"
-    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, \"\n\", \"\\n\")}"
-    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, \"\n\", \"\\n\")}"
+    etcd_ca            = "${replace(module.ca.ca_cert_pem, "\n", "\\n")}"
+    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, "\n", "\\n")}"
+    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, "\n", "\\n")}"
   }
 }
 
@@ -141,9 +141,9 @@ resource "template_file" "worker_cloud_init" {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"
     region             = "${var.region}"
-    etcd_ca            = "${replace(module.ca.ca_cert_pem, \"\n\", \"\\n\")}"
-    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, \"\n\", \"\\n\")}"
-    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, \"\n\", \"\\n\")}"
+    etcd_ca            = "${replace(module.ca.ca_cert_pem, "\n", "\\n")}"
+    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, "\n", "\\n")}"
+    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, "\n", "\\n")}"
   }
 }
 
@@ -154,9 +154,9 @@ resource "template_file" "edge-router_cloud_init" {
     etcd_discovery_url = "${file(var.etcd_discovery_url_file)}"
     size               = "${var.masters}"
     region             = "${var.region}"
-    etcd_ca            = "${replace(module.ca.ca_cert_pem, \"\n\", \"\\n\")}"
-    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, \"\n\", \"\\n\")}"
-    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, \"\n\", \"\\n\")}"
+    etcd_ca            = "${replace(module.ca.ca_cert_pem, "\n", "\\n")}"
+    etcd_cert          = "${replace(module.etcd_cert.etcd_cert_pem, "\n", "\\n")}"
+    etcd_key           = "${replace(module.etcd_cert.etcd_private_key, "\n", "\\n")}"
   }
 }
 
@@ -262,11 +262,11 @@ resource "digitalocean_droplet" "edge-router" {
 
 # Outputs
 output "master_ips" {
-  value = "${join(",", digitalocean_droplet.master.*.ipv4_address)}"
+  value = ["${digitalocean_droplet.master.*.ipv4_address}"]
 }
 output "worker_ips" {
-  value = "${join(",", digitalocean_droplet.worker.*.ipv4_address)}"
+  value = ["${digitalocean_droplet.worker.*.ipv4_address}"]
 }
 output "edge-router_ips" {
-  value = "${join(",", digitalocean_droplet.edge-router.*.ipv4_address)}"
+  value = ["${digitalocean_droplet.edge-router.*.ipv4_address}"]
 }
